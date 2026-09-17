@@ -3,11 +3,14 @@
   stdenv,
   audacious-plugins,
   fetchFromGitHub,
+  gtk3,
   meson,
   ninja,
   pkg-config,
   qt6,
+  wrapGAppsHook3,
   withPlugins ? false,
+  withGtk3 ? true,
 }:
 
 stdenv.mkDerivation rec {
@@ -26,16 +29,20 @@ stdenv.mkDerivation rec {
     ninja
     pkg-config
     qt6.wrapQtAppsHook
-  ];
+  ]
+  ++ lib.optionals withGtk3 [ wrapGAppsHook3 ];
 
   buildInputs = [
     qt6.qtbase
     qt6.qtsvg
     qt6.qtwayland
+  ]
+  ++ lib.optionals withGtk3 [
+    gtk3
   ];
 
   mesonFlags = [
-    "-Dgtk=false"
+    "-Dgtk=${lib.boolToString withGtk3}"
     "-Dbuildstamp=NixOS"
   ];
 
